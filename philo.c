@@ -1,28 +1,26 @@
 #include "philo.h"
 
-void	init_mutex(t_value *value)
+void	philo_thread(t_value *value, t_philo **philo)
 {
 	int	i;
 
-	i = 1;
+	i = 0;
+	pthread_mutex_lock(value->stop);
 	while (i < value->philo_numbers)
 	{
-		pthread_mutex_init(value->forks + i, NULL);
+		pthread_create(value->threads + i, NULL, philo_day, philo + i);
+		pthread_detach(value->threads[i]);
 		i++;
+		usleep(100);
 	}
-	pthread_mutex_init(value->death, NULL);
-	pthread_mutex_init(value->stop, NULL);
-	pthread_mutex_init(value->msg, NULL);
-}
-
-void	philo_day(t_value *value)
-{
-	init_mutex(value);
+	pthread_mutex_lock(value->stop);
+	printf("TEST\n");
 }
 
 int	main(int ac, char **av)
 {
 	t_value	value;
+	t_philo	*philo;
 
 	if (ac != 5 && ac != 6)
 		printf("Error numbers of argument\n");
@@ -30,8 +28,11 @@ int	main(int ac, char **av)
 	{
 		if (init_arg(av, &value))
 			return (0);
+		philo = philo_init(&value);
 		value.start = get_time();
-		philo_day(&value);
+		init_mutex(&value);
+		philo_thread(&value, &philo);
+		ft_clean(&value, philo);
 	}
 	return (0);
 }

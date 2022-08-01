@@ -1,6 +1,6 @@
 NAME = philo
 
-SRC = philo.c verif_arg.c utils.c
+SRC = philo.c verif_arg.c init.c utils.c philo_day.c
 
 OBJ = $(SRC:.c=.o)
 
